@@ -504,9 +504,7 @@
         // 觸控控制變數
         let isTouching = false;
         let previousTouchX = 0;
-        let previousTouchY = 0;
         let touchStartX = 0;
-        let touchStartY = 0;
 
         // 響應式縮放函數
         function getResponsiveScale() {
@@ -821,9 +819,7 @@
             if (event.touches.length === 1) {
                 isTouching = true;
                 touchStartX = event.touches[0].clientX;
-                touchStartY = event.touches[0].clientY;
                 previousTouchX = event.touches[0].clientX;
-                previousTouchY = event.touches[0].clientY;
             }
         }
 
@@ -836,26 +832,14 @@
             
             if (event.touches.length === 1) {
                 const currentTouchX = event.touches[0].clientX;
-                const currentTouchY = event.touches[0].clientY;
                 const deltaX = currentTouchX - previousTouchX;
-                const deltaY = currentTouchY - previousTouchY;
                 
-                // 觸控旋轉靈敏度調整 - 增加旋轉程度
-                const rotationSpeedX = 0.008;  // 水平旋轉速度
-                const rotationSpeedY = 0.005;  // 垂直旋轉速度（稍微小一點）
-                
-                // 水平滑動控制 Y 軸旋轉（左右旋轉）
-                powerBank.rotation.y += deltaX * rotationSpeedX;
-                
-                // 垂直滑動控制 X 軸旋轉（上下傾斜）
-                powerBank.rotation.x += deltaY * rotationSpeedY;
-                
-                // 限制 X 軸旋轉角度，避免過度傾斜
-                powerBank.rotation.x = Math.max(-Math.PI / 6, Math.min(Math.PI / 6, powerBank.rotation.x));
+                // 觸控旋轉靈敏度調整 - 增加旋轉程度，僅左右旋轉
+                const rotationSpeed = 0.008;  // 增加旋轉靈敏度
+                powerBank.rotation.y += deltaX * rotationSpeed;
                 
                 // 更新前一個觸控位置
                 previousTouchX = currentTouchX;
-                previousTouchY = currentTouchY;
                 
                 // 檢查是否需要顯示或隱藏 LED 卡片
                 checkLEDCardVisibility();
@@ -869,9 +853,7 @@
             
             isTouching = false;
             previousTouchX = 0;
-            previousTouchY = 0;
             touchStartX = 0;
-            touchStartY = 0;
         }
 
         // 獲取 3D 模型上 LED 螢幕的 2D 螢幕位置
@@ -1064,7 +1046,7 @@
             
             if (isTouchDevice && isMobile) {
                 // 手機/平板觸控裝置
-                controlText.textContent = '左右拖拽旋轉 • 上下拖拽傾斜 • 轉到正面查看 LED 功能';
+                controlText.textContent = '用手指左右拖拽旋轉產品 • 轉到正面查看 LED 功能';
                 controlIcon.textContent = '👆';
             } else if (isTouchDevice) {
                 // 觸控螢幕桌機或大平板
