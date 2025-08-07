@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WT-08 行動電源 - 3D 產品展示</title>
+    
+    <!-- 網站縮圖設定 -->
+    <meta name="description" content="WT-08 新世代行動電源 3D 互動展示 - 智能LED顯示、快速充電、高品質金屬外殼">
+    
+    <!-- Open Graph 標籤 (Facebook, LinkedIn 等) -->
+    <meta property="og:title" content="WT-08 行動電源 - 3D 產品展示">
+    <meta property="og:description" content="WT-08 新世代行動電源 3D 互動展示 - 智能LED顯示、快速充電、高品質金屬外殼">
+    <meta property="og:image" content="Thumb.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    
+    <!-- Twitter Card 標籤 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="WT-08 行動電源 - 3D 產品展示">
+    <meta name="twitter:description" content="WT-08 新世代行動電源 3D 互動展示 - 智能LED顯示、快速充電、高品質金屬外殼">
+    <meta name="twitter:image" content="Thumb.png">
+    
+    <!-- 瀏覽器圖示 -->
+    <link rel="icon" type="image/png" href="Thumb.png">
+    <link rel="apple-touch-icon" href="Thumb.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* 3D 展示區域 */
+        #three-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #three-container:active {
+            cursor: grabbing;
+        }
+
+        /* 標題區域 */
+        .header {
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            z-index: 10;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+
+
+        /* LED 資訊卡片 */
+        .led-info-card {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%) translateX(100px);
+            z-index: 15;
+            width: 320px;
+            background: rgba(0, 255, 0, 0.1);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(0, 255, 0, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 40px rgba(0, 255, 0, 0.1);
+        }
+
+        .led-info-card.show {
+            transform: translateY(-50%) translateX(0);
+            opacity: 1;
+        }
+
+        .led-info-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #00FF00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .led-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #00FF00, #00AA00);
+            border-radius: 50%;
+            animation: ledPulse 2s ease-in-out infinite alternate;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+        }
+
+        .led-info-card p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #E8F5E8;
+        }
+
+        .led-features {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .led-features li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #D0F0D0;
+        }
+
+        .led-features li::before {
+            content: "●";
+            position: absolute;
+            left: 0;
+            color: #00FF00;
+            font-size: 1.2rem;
+            animation: ledBlink 1.5s ease-in-out infinite;
+        }
+
+        /* 控制提示 */
+        .controls-hint {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        .controls-hint p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .mouse-icon {
+            font-size: 2rem;
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes ledPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        @keyframes ledBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* 指示線 */
+        .pointer-line {
+            position: absolute;
+            z-index: 14;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pointer-line.show {
+            opacity: 1;
+        }
+
+        .pointer-line svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .pointer-line path {
+            fill: none;
+            stroke: #00FF00;
+            stroke-width: 3;
+            stroke-dasharray: 10, 5;
+            animation: dashMove 2s linear infinite;
+            filter: drop-shadow(0 0 8px rgba(0, 255, 0, 0.6));
+        }
+
+        .pointer-dot {
+            fill: #00FF00;
+            r: 6;
+            animation: dotPulse 1.5s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 0, 0.8));
+        }
+
+        @keyframes dashMove {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: 15; }
+        }
+
+        @keyframes dotPulse {
+            0% { r: 6; }
+            100% { r: 9; }
+        }
+
+        /* 載入動畫 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .header {
+                top: 20px;
+                left: 20px;
+            }
+
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .controls-hint {
+                bottom: 20px;
+            }
+
+            .led-info-card {
+                right: 20px;
+                left: 20px;
+                width: auto;
+                bottom: 100px;
+                top: auto;
+                transform: translateY(100px);
+            }
+
+            .led-info-card.show {
+                transform: translateY(0);
+            }
+
+            .pointer-line path {
+                stroke-width: 2;
+            }
+
+            .pointer-dot {
+                r: 4;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 載入畫面 -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>載入 3D 模型中...</p>
+        </div>
+
+        <!-- 3D 展示區域 -->
+        <div id="three-container"></div>
+
+        <!-- 標題區域 -->
+        <div class="header">
+            <img src="3D/LOGO_WT08.png" alt="WT-08 Logo" class="logo">
+            <h1 class="main-title">WT-08</h1>
+            <p class="subtitle">新世代行動電源</p>
+        </div>
+
+
+
+        <!-- 指示線 -->
+        <div class="pointer-line" id="pointer-line">
+            <svg>
+                <path id="pointer-path" d=""/>
+                <circle class="pointer-dot" id="pointer-dot" cx="0" cy="0"/>
+            </svg>
+        </div>
+
+        <!-- LED 資訊卡片 -->
+        <div class="led-info-card" id="led-card">
+            <h3>
+                <div class="led-icon"></div>
+                LED 電量顯示螢幕
+            </h3>
+            <p>智能數位顯示系統，讓您隨時掌握電量狀態</p>
+            <ul class="led-features">
+                <li>四段式 LED 電量指示</li>
+                <li>精準百分比數字顯示</li>
+                <li>充電狀態即時顯示</li>
+                <li>低電量警示功能</li>
+                <li>夜間背光設計</li>
+            </ul>
+        </div>
+
+        <!-- 控制提示 -->
+        <div class="controls-hint">
+            <p>使用滾輪旋轉產品 • 轉到正面查看 LED 功能</p>
+            <div class="mouse-icon">🖱️</div>
+        </div>
+    </div>
+
+    <!-- Three.js 模組載入 -->
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // 全域變數
+        let scene, camera, renderer, controls;
+        let powerBank = null;
+        let isLoaded = false;
+
+        // 響應式縮放函數
+        function getResponsiveScale() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            // 根據螢幕大小調整縮放比例
+            if (width < 768) {
+                // 手機螢幕：縮小一些
+                return 0.7;
+            } else if (width < 1024) {
+                // 平板螢幕：稍微縮小
+                return 0.85;
+            } else if (width > 1920) {
+                // 大螢幕：稍微放大
+                return 1.2;
+            } else {
+                // 桌機螢幕：標準大小
+                return 1.0;
+            }
+        }
+
+        // 響應式相機距離函數
+        function getResponsiveCameraDistance() {
+            const width = window.innerWidth;
+            
+            // 根據螢幕大小調整相機距離
+            if (width < 768) {
+                // 手機螢幕：相機拉遠一些
+                return 5;
+            } else if (width < 1024) {
+                // 平板螢幕：中等距離
+                return 4.5;
+            } else if (width > 1920) {
+                // 大螢幕：可以拉近一些
+                return 3.5;
+            } else {
+                // 桌機螢幕：標準距離
+                return 4;
+            }
+        }
+
+        // 初始化 3D 場景
+        function init() {
+            // 創建場景
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            scene.fog = new THREE.Fog(0x000000, 10, 50);
+
+            // 創建相機（響應式位置）
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const responsiveDistance = getResponsiveCameraDistance();
+            camera.position.set(responsiveDistance, responsiveDistance * 0.7, responsiveDistance);
+
+            // 創建渲染器
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            document.getElementById('three-container').appendChild(renderer.domElement);
+
+            // 設置控制器（完全停用，我們用自訂滾輪控制）
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = false;
+            controls.enableZoom = false;    // 停用滾輪縮放
+            controls.enableRotate = false;  // 停用滑鼠拖曳旋轉
+            controls.enablePan = false;     // 停用平移
+
+            // 添加燈光
+            setupLighting();
+
+            // 載入 3D 模型
+            loadModel();
+
+            // 開始渲染循環
+            animate();
+
+            // 添加事件監聽器
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('wheel', onWheel, { passive: false });
+        }
+
+        // 設置燈光 - 針對金屬材質優化
+        function setupLighting() {
+            // 主光源 - 增強亮度突出金屬質感
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            mainLight.position.set(10, 10, 5);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            scene.add(mainLight);
+
+            // 環境光 - 適度增強
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+            scene.add(ambientLight);
+
+            // 填補光 - 增強反射效果
+            const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.6);
+            fillLight.position.set(-5, 5, -5);
+            scene.add(fillLight);
+
+            // 背景光 - 增強邊緣光效果
+            const rimLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            rimLight.position.set(0, 0, -10);
+            scene.add(rimLight);
+
+            // 添加額外的金屬反射光
+            const metalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+            metalLight.position.set(-10, -5, 10);
+            scene.add(metalLight);
+        }
+
+        // 創建替代模型（當 FBX 載入失敗時使用）
+        function createFallbackModel() {
+            // 創建一個簡單的行動電源形狀替代模型
+            const group = new THREE.Group();
+            
+            // 主體 - 調整為適合響應式設計的基礎尺寸，使用銀色金屬材質
+            const bodyGeometry = new THREE.BoxGeometry(6, 2.4, 12);  // 再放大50%，配合新的縮放系統
+            const bodyMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xC0C0C0,        // 銀色
+                metalness: 0.9,         // 高金屬度
+                roughness: 0.1,         // 低粗糙度
+                envMapIntensity: 1.5    // 環境反射強度
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+            
+            // USB 接口 - 再放大50%，使用深色金屬材質
+            const usbGeometry = new THREE.BoxGeometry(0.9, 0.3, 1.8);  // 再放大50%
+            const usbMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x404040,        // 深灰色
+                metalness: 0.8,         // 金屬度
+                roughness: 0.3          // 稍微粗糙
+            });
+            const usb1 = new THREE.Mesh(usbGeometry, usbMaterial);
+            usb1.position.set(-2.1, 0.9, -5.4);  // 調整位置
+            group.add(usb1);
+            
+            const usb2 = new THREE.Mesh(usbGeometry, usbMaterial);
+            usb2.position.set(2.1, 0.9, -5.4);  // 調整位置
+            group.add(usb2);
+            
+            // LED 指示燈 - 再放大50%
+            const ledGeometry = new THREE.SphereGeometry(0.15, 16, 16);  // 再放大50%
+            const ledMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x00ff00,
+                emissive: 0x004400
+            });
+            for (let i = 0; i < 4; i++) {
+                const led = new THREE.Mesh(ledGeometry, ledMaterial);
+                led.position.set(-1.8 + i * 1.2, 1.23, 1.5);  // 調整位置和間距
+                group.add(led);
+            }
+            
+            // 品牌標誌區域 - 再放大50%
+            const logoGeometry = new THREE.PlaneGeometry(4.5, 1.5);  // 再放大50%
+            const logoMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.9
+            });
+            const logo = new THREE.Mesh(logoGeometry, logoMaterial);
+            logo.position.set(0, 1.23, 3);  // 調整位置
+            logo.rotation.x = -Math.PI / 2;
+            group.add(logo);
+            
+            return group;
+        }
+
+        // 載入 3D 模型
+        function loadModel() {
+            const loader = new FBXLoader();
+            
+            loader.load(
+                '3D/WT-08.fbx',
+                function (object) {
+                    powerBank = object;
+                    
+                    // 調整模型大小和位置（響應式縮放）
+                    const baseScale = 0.3;  // 再放大50%，現在是原來的30倍
+                    const responsiveScale = getResponsiveScale();
+                    object.scale.setScalar(baseScale * responsiveScale);
+                    object.position.set(0, 0, 0);  // 置中顯示
+                    
+                    // 添加陰影和銀色金屬材質
+                    object.traverse(function (child) {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                            
+                            // 應用銀色金屬材質
+                            if (child.material) {
+                                // 如果是標準材質，直接修改
+                                if (child.material.isMeshStandardMaterial || child.material.isMeshPhongMaterial) {
+                                    child.material.color.setHex(0xC0C0C0);  // 銀色
+                                    child.material.metalness = 0.9;         // 高金屬度
+                                    child.material.roughness = 0.1;         // 低粗糙度，更光滑
+                                    child.material.envMapIntensity = 1.5;   // 增強環境反射
+                                } else {
+                                    // 如果不是標準材質，創建新的金屬材質
+                                    const metalMaterial = new THREE.MeshStandardMaterial({
+                                        color: 0xC0C0C0,        // 銀色
+                                        metalness: 0.9,         // 高金屬度
+                                        roughness: 0.1,         // 低粗糙度
+                                        envMapIntensity: 1.5    // 環境反射強度
+                                    });
+                                    child.material = metalMaterial;
+                                }
+                                
+                                // 確保材質需要更新
+                                child.material.needsUpdate = true;
+                            }
+                        }
+                    });
+
+                    // 標記為 FBX 模型
+                    object.userData.isFBX = true;
+                    
+                    scene.add(object);
+                    isLoaded = true;
+                    
+                    // 隱藏載入畫面
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    console.log('FBX 模型載入成功！');
+                },
+                function (progress) {
+                    if (progress.total > 0) {
+                        const percent = Math.round((progress.loaded / progress.total) * 100);
+                        console.log('載入進度:', percent + '%');
+                        document.querySelector('.loading p').textContent = `載入 3D 模型中... ${percent}%`;
+                    }
+                },
+                function (error) {
+                    console.error('載入 FBX 模型時發生錯誤:', error);
+                    console.log('使用替代模型...');
+                    loadFallbackModel();
+                }
+            );
+        }
+
+        // 載入替代模型
+        function loadFallbackModel() {
+            powerBank = createFallbackModel();
+            
+            // 標記為替代模型
+            powerBank.userData.isFBX = false;
+            
+            // 應用響應式縮放
+            const responsiveScale = getResponsiveScale();
+            powerBank.scale.setScalar(responsiveScale);
+            powerBank.position.set(0, 0, 0);  // 置中顯示
+            scene.add(powerBank);
+            isLoaded = true;
+            
+            // 隱藏載入畫面
+            document.getElementById('loading').style.display = 'none';
+            
+            // 顯示使用替代模型的提示
+            const loadingElement = document.getElementById('loading');
+            loadingElement.style.display = 'block';
+            loadingElement.innerHTML = `
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; backdrop-filter: blur(10px);">
+                    <p>✅ 正在使用示範模型</p>
+                    <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">實際專案將載入您的 FBX 檔案</p>
+                </div>
+            `;
+            
+            // 3秒後隱藏提示
+            setTimeout(() => {
+                loadingElement.style.display = 'none';
+            }, 3000);
+            
+            console.log('替代模型載入成功！');
+        }
+
+
+
+        // 滾輪旋轉控制
+        function onWheel(event) {
+            if (!isLoaded || !powerBank) return;
+            
+            // 防止頁面滾動
+            event.preventDefault();
+            
+            // 根據滾輪方向旋轉模型，調整靈敏度
+            const rotationSpeed = 0.001;  // 大幅降低靈敏度讓旋轉更精細
+            powerBank.rotation.y += event.deltaY * rotationSpeed;
+            
+            // 檢查是否需要顯示或隱藏 LED 卡片
+            checkLEDCardVisibility();
+        }
+
+        // 獲取 3D 模型上 LED 螢幕的 2D 螢幕位置
+        function getLEDScreenPosition() {
+            if (!isLoaded || !powerBank) return null;
+            
+            // LED 螢幕在模型上的相對位置 - 再向上移動50%
+            const ledPosition = new THREE.Vector3(0, 1.8, 3.2); // LED 在模型正面圓形顯示區域（再向上移動50%）
+            
+            // 將 3D 位置轉換為世界座標
+            const worldPosition = ledPosition.clone();
+            powerBank.localToWorld(worldPosition);
+            
+            // 將世界座標投影到螢幕座標
+            const screenPosition = worldPosition.clone();
+            screenPosition.project(camera);
+            
+            // 轉換為像素座標
+            const x = (screenPosition.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-screenPosition.y * 0.5 + 0.5) * window.innerHeight;
+            
+            return { x, y };
+        }
+
+        // 更新指示線
+        function updatePointerLine() {
+            const ledCard = document.getElementById('led-card');
+            const pointerLine = document.getElementById('pointer-line');
+            const path = document.getElementById('pointer-path');
+            const dot = document.getElementById('pointer-dot');
+            
+            if (!ledCard.classList.contains('show')) {
+                pointerLine.classList.remove('show');
+                return;
+            }
+            
+            // 獲取 LED 螢幕位置
+            const ledPos = getLEDScreenPosition();
+            if (!ledPos) return;
+            
+            // 獲取字卡位置
+            const cardRect = ledCard.getBoundingClientRect();
+            const cardX = cardRect.left;
+            const cardY = cardRect.top + cardRect.height / 2;
+            
+            // 設置 SVG 大小覆蓋整個螢幕
+            const svg = pointerLine.querySelector('svg');
+            svg.style.width = '100vw';
+            svg.style.height = '100vh';
+            pointerLine.style.left = '0';
+            pointerLine.style.top = '0';
+            pointerLine.style.width = '100vw';
+            pointerLine.style.height = '100vh';
+            
+            // 計算控制點創建曲線
+            const controlX = cardX - (cardX - ledPos.x) * 0.3;
+            const controlY = cardY - (cardY - ledPos.y) * 0.5;
+            
+            // 計算綠色圓點的最終位置
+            const finalDotX = ledPos.x;
+            const finalDotY = ledPos.y - 100;
+            
+            // 創建曲線路徑 - 終點連接到綠色圓點
+            const pathData = `M ${cardX} ${cardY} Q ${controlX} ${controlY} ${finalDotX} ${finalDotY}`;
+            path.setAttribute('d', pathData);
+            
+            // 設置終點圓點位置 - 向上移動100px
+            dot.setAttribute('cx', finalDotX);
+            dot.setAttribute('cy', finalDotY);
+            
+            // 顯示指示線
+            pointerLine.classList.add('show');
+        }
+
+        // 檢查 LED 卡片顯示條件
+        function checkLEDCardVisibility() {
+            if (!isLoaded || !powerBank) return;
+            
+            // 獲取當前旋轉角度（正規化到 0-2π 範圍）
+            let currentRotation = powerBank.rotation.y % (Math.PI * 2);
+            if (currentRotation < 0) currentRotation += Math.PI * 2;
+            
+            // 定義 LED 螢幕可見的角度範圍 - 保持起始角度，結束角度設為70度
+            const ledVisibleStart = Math.PI * 0.2;   // 約 36 度（保持起始角度）
+            const ledVisibleEnd = Math.PI * 0.39;    // 約 70 度
+            
+            const ledCard = document.getElementById('led-card');
+            const pointerLine = document.getElementById('pointer-line');
+            
+            // 檢查是否在可見角度範圍內
+            const isInLEDRange = (currentRotation >= ledVisibleStart && currentRotation <= ledVisibleEnd);
+            
+            if (isInLEDRange) {
+                // 顯示 LED 卡片
+                if (!ledCard.classList.contains('show')) {
+                    ledCard.classList.add('show');
+                    // 延遲顯示指示線，讓卡片先出現
+                    setTimeout(() => {
+                        updatePointerLine();
+                    }, 300);
+                } else {
+                    // 卡片已顯示，更新指示線位置
+                    updatePointerLine();
+                }
+            } else {
+                // 隱藏 LED 卡片和指示線
+                if (ledCard.classList.contains('show')) {
+                    ledCard.classList.remove('show');
+                    pointerLine.classList.remove('show');
+                }
+            }
+        }
+
+        // 視窗大小改變處理（包含響應式重新縮放）
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // 重新調整模型縮放和相機位置
+            if (isLoaded && powerBank) {
+                const responsiveScale = getResponsiveScale();
+                const baseScale = 0.3;  // 與 FBX 載入時的基礎縮放保持一致
+                
+                if (powerBank.userData.isFBX) {
+                    // FBX 模型
+                    powerBank.scale.setScalar(baseScale * responsiveScale);
+                } else {
+                    // 替代模型
+                    powerBank.scale.setScalar(responsiveScale);
+                }
+                
+                // 調整相機位置
+                const responsiveDistance = getResponsiveCameraDistance();
+                camera.position.set(responsiveDistance, responsiveDistance * 0.7, responsiveDistance);
+            }
+            
+            // 更新指示線位置
+            setTimeout(() => {
+                updatePointerLine();
+            }, 100);
+        }
+
+        // 動畫循環
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // 更新控制器
+            controls.update();
+            
+            // 每幀檢查 LED 卡片顯示狀態（以防有其他旋轉觸發）
+            if (isLoaded) {
+                checkLEDCardVisibility();
+            }
+            
+            // 渲染場景
+            renderer.render(scene, camera);
+        }
+
+        // 頁面載入完成後初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
