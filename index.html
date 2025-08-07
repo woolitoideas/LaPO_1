@@ -54,6 +54,7 @@
             width: 100%;
             height: 100%;
             cursor: grab;
+            touch-action: none; /* 禁用瀏覽器預設的觸控行為 */
         }
 
         #three-container:active {
@@ -356,8 +357,8 @@
 
         <!-- 控制提示 -->
         <div class="controls-hint">
-            <p>使用滾輪旋轉產品 • 轉到正面查看 LED 功能</p>
-            <div class="mouse-icon">🖱️</div>
+            <p id="control-text">使用滾輪或觸控拖拽旋轉產品 • 轉到正面查看 LED 功能</p>
+            <div class="mouse-icon" id="control-icon">🖱️</div>
         </div>
     </div>
 
@@ -381,6 +382,11 @@
         let scene, camera, renderer, controls;
         let powerBank = null;
         let isLoaded = false;
+        
+        // 觸控控制變數
+        let isTouching = false;
+        let previousTouchX = 0;
+        let touchStartX = 0;
 
         // 響應式縮放函數
         function getResponsiveScale() {
@@ -463,6 +469,12 @@
             // 添加事件監聽器
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('wheel', onWheel, { passive: false });
+            
+            // 添加觸控事件監聽器
+            const container = document.getElementById('three-container');
+            container.addEventListener('touchstart', onTouchStart, { passive: false });
+            container.addEventListener('touchmove', onTouchMove, { passive: false });
+            container.addEventListener('touchend', onTouchEnd, { passive: false });
         }
 
         // 設置燈光 - 針對金屬材質優化
@@ -679,6 +691,53 @@
             checkLEDCardVisibility();
         }
 
+        // 觸控開始事件
+        function onTouchStart(event) {
+            if (!isLoaded || !powerBank) return;
+            
+            // 防止預設行為
+            event.preventDefault();
+            
+            if (event.touches.length === 1) {
+                isTouching = true;
+                touchStartX = event.touches[0].clientX;
+                previousTouchX = event.touches[0].clientX;
+            }
+        }
+
+        // 觸控移動事件
+        function onTouchMove(event) {
+            if (!isLoaded || !powerBank || !isTouching) return;
+            
+            // 防止預設行為（避免頁面滾動）
+            event.preventDefault();
+            
+            if (event.touches.length === 1) {
+                const currentTouchX = event.touches[0].clientX;
+                const deltaX = currentTouchX - previousTouchX;
+                
+                // 觸控旋轉靈敏度調整
+                const rotationSpeed = 0.005;  // 適合觸控的旋轉速度
+                powerBank.rotation.y += deltaX * rotationSpeed;
+                
+                // 更新前一個觸控位置
+                previousTouchX = currentTouchX;
+                
+                // 檢查是否需要顯示或隱藏 LED 卡片
+                checkLEDCardVisibility();
+            }
+        }
+
+        // 觸控結束事件
+        function onTouchEnd(event) {
+            // 防止預設行為
+            event.preventDefault();
+            
+            isTouching = false;
+            previousTouchX = 0;
+            touchStartX = 0;
+        }
+
         // 獲取 3D 模型上 LED 螢幕的 2D 螢幕位置
         function getLEDScreenPosition() {
             if (!isLoaded || !powerBank) return null;
@@ -818,6 +877,9 @@
             setTimeout(() => {
                 updatePointerLine();
             }, 100);
+            
+            // 更新控制提示（響應式變化）
+            updateControlHints();
         }
 
         // 動畫循環
@@ -836,8 +898,35 @@
             renderer.render(scene, camera);
         }
 
+        // 檢測裝置類型並更新控制提示
+        function updateControlHints() {
+            const controlText = document.getElementById('control-text');
+            const controlIcon = document.getElementById('control-icon');
+            
+            // 檢測是否為觸控裝置
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isTouchDevice && isMobile) {
+                // 手機/平板觸控裝置
+                controlText.textContent = '用手指左右拖拽旋轉產品 • 轉到正面查看 LED 功能';
+                controlIcon.textContent = '👆';
+            } else if (isTouchDevice) {
+                // 觸控螢幕桌機或大平板
+                controlText.textContent = '使用滾輪或觸控拖拽旋轉產品 • 轉到正面查看 LED 功能';
+                controlIcon.textContent = '🖱️';
+            } else {
+                // 純滑鼠桌機
+                controlText.textContent = '使用滾輪旋轉產品 • 轉到正面查看 LED 功能';
+                controlIcon.textContent = '🖱️';
+            }
+        }
+
         // 頁面載入完成後初始化
-        window.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('DOMContentLoaded', () => {
+            updateControlHints();
+            init();
+        });
     </script>
 </body>
 </html>
