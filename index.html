@@ -280,33 +280,151 @@
                 left: 20px;
             }
 
+            .logo {
+                width: 80px; /* 手機版縮小 logo */
+                margin-bottom: 15px;
+            }
+
             .main-title {
-                font-size: 2rem;
+                font-size: 1.8rem; /* 調整標題大小 */
+            }
+
+            .subtitle {
+                font-size: 1rem; /* 調整副標題大小 */
             }
 
             .controls-hint {
-                bottom: 20px;
+                bottom: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
             }
 
+            .controls-hint p {
+                font-size: 0.9rem; /* 調整控制提示文字大小 */
+                margin-bottom: 8px;
+            }
+
+            .mouse-icon {
+                font-size: 1.5rem; /* 調整圖標大小 */
+            }
+
+            /* 手機版資訊卡重新設計 */
             .led-info-card {
-                right: 20px;
-                left: 20px;
-                width: auto;
-                bottom: 100px;
+                position: fixed; /* 改為固定定位 */
+                left: 15px;
+                right: 15px;
+                bottom: 80px; /* 距離底部更遠一些 */
                 top: auto;
-                transform: translateY(100px);
+                width: auto;
+                max-width: none;
+                padding: 20px; /* 減少內邊距 */
+                transform: translateY(120px); /* 初始隱藏位置 */
+                border-radius: 15px; /* 稍微減少圓角 */
+                backdrop-filter: blur(10px); /* 稍微減少模糊效果 */
+                box-shadow: 0 15px 30px rgba(0, 255, 0, 0.15); /* 調整陰影 */
             }
 
             .led-info-card.show {
-                transform: translateY(0);
+                transform: translateY(0); /* 顯示時的位置 */
             }
 
+            .led-info-card h3 {
+                font-size: 1.3rem; /* 調整標題大小 */
+                margin-bottom: 12px;
+                gap: 8px;
+            }
+
+            .led-icon {
+                width: 25px; /* 縮小圖標 */
+                height: 25px;
+            }
+
+            .led-info-card p {
+                font-size: 0.9rem; /* 調整段落文字大小 */
+                line-height: 1.5;
+                margin-bottom: 12px;
+            }
+
+            .led-features {
+                margin: 0;
+            }
+
+            .led-features li {
+                margin: 8px 0; /* 減少項目間距 */
+                padding-left: 20px; /* 調整縮進 */
+                font-size: 0.85rem; /* 調整清單文字大小 */
+                line-height: 1.4;
+            }
+
+            .led-features li::before {
+                font-size: 1rem; /* 調整項目符號大小 */
+            }
+
+            /* 手機版指示線調整 */
             .pointer-line path {
                 stroke-width: 2;
             }
 
             .pointer-dot {
                 r: 4;
+            }
+        }
+
+        /* 更小螢幕的額外優化 */
+        @media (max-width: 480px) {
+            .header {
+                top: 15px;
+                left: 15px;
+            }
+
+            .logo {
+                width: 60px;
+                margin-bottom: 10px;
+            }
+
+            .main-title {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .led-info-card {
+                left: 10px;
+                right: 10px;
+                bottom: 70px;
+                padding: 15px;
+            }
+
+            .led-info-card h3 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+
+            .led-icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .led-info-card p {
+                font-size: 0.85rem;
+                margin-bottom: 10px;
+            }
+
+            .led-features li {
+                font-size: 0.8rem;
+                margin: 6px 0;
+                padding-left: 18px;
+            }
+
+            .controls-hint p {
+                font-size: 0.8rem;
+            }
+
+            .mouse-icon {
+                font-size: 1.3rem;
             }
         }
     </style>
@@ -778,8 +896,19 @@
             
             // 獲取字卡位置
             const cardRect = ledCard.getBoundingClientRect();
-            const cardX = cardRect.left;
-            const cardY = cardRect.top + cardRect.height / 2;
+            const isMobile = window.innerWidth <= 768;
+            
+            // 手機版和桌機版使用不同的連接點
+            let cardX, cardY;
+            if (isMobile) {
+                // 手機版：從卡片頂部中央連接
+                cardX = cardRect.left + cardRect.width / 2;
+                cardY = cardRect.top;
+            } else {
+                // 桌機版：從卡片左側中央連接
+                cardX = cardRect.left;
+                cardY = cardRect.top + cardRect.height / 2;
+            }
             
             // 設置 SVG 大小覆蓋整個螢幕
             const svg = pointerLine.querySelector('svg');
@@ -790,13 +919,21 @@
             pointerLine.style.width = '100vw';
             pointerLine.style.height = '100vh';
             
-            // 計算控制點創建曲線
-            const controlX = cardX - (cardX - ledPos.x) * 0.3;
-            const controlY = cardY - (cardY - ledPos.y) * 0.5;
-            
             // 計算綠色圓點的最終位置
             const finalDotX = ledPos.x;
-            const finalDotY = ledPos.y - 100;
+            const finalDotY = ledPos.y - 100 + (isMobile ? 100 : 0); // 手機版下移100px
+            
+            // 計算控制點創建曲線（針對手機版和桌機版優化）
+            let controlX, controlY;
+            if (isMobile) {
+                // 手機版：垂直方向的曲線
+                controlX = cardX + (finalDotX - cardX) * 0.3;
+                controlY = cardY - (cardY - finalDotY) * 0.7;
+            } else {
+                // 桌機版：水平方向的曲線
+                controlX = cardX - (cardX - finalDotX) * 0.3;
+                controlY = cardY - (cardY - finalDotY) * 0.5;
+            }
             
             // 創建曲線路徑 - 終點連接到綠色圓點
             const pathData = `M ${cardX} ${cardY} Q ${controlX} ${controlY} ${finalDotX} ${finalDotY}`;
