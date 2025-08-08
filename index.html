@@ -95,8 +95,8 @@
 
 
 
-        /* LED 資訊卡片 */
-        .led-info-card {
+        /* LED 資訊卡片與 認證資訊卡片（共用版面設定） */
+        .led-info-card, .cert-info-card {
             position: absolute;
             right: 50px;
             top: 50%;
@@ -113,12 +113,12 @@
             box-shadow: 0 20px 40px rgba(0, 255, 0, 0.1);
         }
 
-        .led-info-card.show {
+        .led-info-card.show, .cert-info-card.show {
             transform: translateY(-50%) translateX(0);
             opacity: 1;
         }
 
-        .led-info-card h3 {
+        .led-info-card h3, .cert-info-card h3 {
             font-size: 1.5rem;
             margin-bottom: 15px;
             color: #00FF00;
@@ -137,7 +137,7 @@
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
         }
 
-        .led-info-card p {
+        .led-info-card p, .cert-info-card p {
             line-height: 1.6;
             margin-bottom: 15px;
             color: #E8F5E8;
@@ -314,8 +314,8 @@
                 font-size: 1.5rem; /* 調整圖標大小 */
             }
 
-            /* 手機版資訊卡重新設計 */
-            .led-info-card {
+            /* 手機版資訊卡重新設計（LED 與 認證卡共用） */
+            .led-info-card, .cert-info-card {
                 position: fixed; /* 改為固定定位 */
                 left: 15px;
                 right: 15px;
@@ -330,11 +330,11 @@
                 box-shadow: 0 15px 30px rgba(0, 255, 0, 0.15); /* 調整陰影 */
             }
 
-            .led-info-card.show {
+            .led-info-card.show, .cert-info-card.show {
                 transform: translateY(0); /* 顯示時的位置 */
             }
 
-            .led-info-card h3 {
+            .led-info-card h3, .cert-info-card h3 {
                 font-size: 1.3rem; /* 調整標題大小 */
                 margin-bottom: 12px;
                 gap: 8px;
@@ -345,7 +345,7 @@
                 height: 25px;
             }
 
-            .led-info-card p {
+            .led-info-card p, .cert-info-card p {
                 font-size: 0.9rem; /* 調整段落文字大小 */
                 line-height: 1.5;
                 margin-bottom: 12px;
@@ -396,14 +396,14 @@
                 font-size: 0.9rem;
             }
 
-            .led-info-card {
+            .led-info-card, .cert-info-card {
                 left: 10px;
                 right: 10px;
                 bottom: 70px;
                 padding: 15px;
             }
 
-            .led-info-card h3 {
+            .led-info-card h3, .cert-info-card h3 {
                 font-size: 1.2rem;
                 margin-bottom: 10px;
             }
@@ -413,7 +413,7 @@
                 height: 20px;
             }
 
-            .led-info-card p {
+            .led-info-card p, .cert-info-card p {
                 font-size: 0.85rem;
                 margin-bottom: 10px;
             }
@@ -476,6 +476,15 @@
                 <li>低電量警示功能</li>
                 <li>夜間背光設計</li>
             </ul>
+        </div>
+
+        <!-- 認證資訊卡片 -->
+        <div class="cert-info-card" id="cert-card">
+            <h3>
+                <div class="led-icon"></div>
+                多國安全認證
+            </h3>
+            <p>BSMI / NCC / CE / FCC / PSE</p>
         </div>
 
         <!-- 控制提示 -->
@@ -975,10 +984,15 @@
             if (currentRotation < 0) currentRotation += Math.PI * 2;
             
             // 定義 LED 螢幕可見的角度範圍 - 保持起始角度，結束角度設為70度
-            const ledVisibleStart = Math.PI * 0.2;   // 約 36 度（保持起始角度）
+            const ledVisibleStart = Math.PI * 0.2;   // 約 36 度
             const ledVisibleEnd = Math.PI * 0.39;    // 約 70 度
+
+            // 定義 認證卡片 顯示的角度範圍：95° ~ 140°
+            const certVisibleStart = Math.PI * (95 / 180);
+            const certVisibleEnd = Math.PI * (140 / 180);
             
             const ledCard = document.getElementById('led-card');
+            const certCard = document.getElementById('cert-card');
             const pointerLine = document.getElementById('pointer-line');
             
             // 檢查是否在可見角度範圍內
@@ -996,11 +1010,29 @@
                     // 卡片已顯示，更新指示線位置
                     updatePointerLine();
                 }
+                // LED 顯示時，隱藏認證卡片
+                if (certCard && certCard.classList.contains('show')) {
+                    certCard.classList.remove('show');
+                }
             } else {
                 // 隱藏 LED 卡片和指示線
                 if (ledCard.classList.contains('show')) {
                     ledCard.classList.remove('show');
                     pointerLine.classList.remove('show');
+                }
+            }
+
+            // 處理認證卡片顯示邏輯
+            const isInCertRange = (currentRotation >= certVisibleStart && currentRotation <= certVisibleEnd);
+            if (isInCertRange) {
+                if (certCard && !certCard.classList.contains('show')) {
+                    certCard.classList.add('show');
+                }
+                // 顯示認證卡片時，隱藏指示線，避免視覺干擾
+                pointerLine.classList.remove('show');
+            } else {
+                if (certCard && certCard.classList.contains('show')) {
+                    certCard.classList.remove('show');
                 }
             }
         }
