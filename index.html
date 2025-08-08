@@ -113,6 +113,14 @@
             box-shadow: 0 20px 40px rgba(0, 255, 0, 0.1);
         }
 
+        /* 認證資訊卡片：桌機版改至左側，位置略低，從左側滑入以增加變化感 */
+        .cert-info-card {
+            left: 50px;
+            right: auto;
+            top: 55%;
+            transform: translateY(-50%) translateX(-100px);
+        }
+
         .led-info-card.show, .cert-info-card.show {
             transform: translateY(-50%) translateX(0);
             opacity: 1;
@@ -319,7 +327,7 @@
                 position: fixed; /* 改為固定定位 */
                 left: 15px;
                 right: 15px;
-                bottom: 80px; /* 距離底部更遠一些 */
+                bottom: 80px; /* LED 預設在底部，認證卡會另外覆寫到上方 */
                 top: auto;
                 width: auto;
                 max-width: none;
@@ -330,12 +338,19 @@
                 box-shadow: 0 15px 30px rgba(0, 255, 0, 0.15); /* 調整陰影 */
             }
 
+            /* 手機版認證卡片：移到行動電源上方，從上方滑入（位置下移一些） */
+            .cert-info-card {
+                top: 120px;
+                bottom: auto;
+                transform: translateY(-120px);
+            }
+
             .led-info-card.show, .cert-info-card.show {
                 transform: translateY(0); /* 顯示時的位置 */
             }
 
             .led-info-card h3, .cert-info-card h3 {
-                font-size: 1.3rem; /* 調整標題大小 */
+                font-size: 1.2rem; /* 微調小一點的標題大小 */
                 margin-bottom: 12px;
                 gap: 8px;
             }
@@ -346,7 +361,7 @@
             }
 
             .led-info-card p, .cert-info-card p {
-                font-size: 0.9rem; /* 調整段落文字大小 */
+                font-size: 0.85rem; /* 微調小一點的段落文字大小 */
                 line-height: 1.5;
                 margin-bottom: 12px;
             }
@@ -358,7 +373,7 @@
             .led-features li {
                 margin: 8px 0; /* 減少項目間距 */
                 padding-left: 20px; /* 調整縮進 */
-                font-size: 0.85rem; /* 調整清單文字大小 */
+                font-size: 0.8rem; /* 微調小一點的清單文字大小 */
                 line-height: 1.4;
             }
 
@@ -399,8 +414,15 @@
             .led-info-card, .cert-info-card {
                 left: 10px;
                 right: 10px;
-                bottom: 70px;
+                bottom: 70px; /* LED 預設在底部，認證卡會另外覆寫到上方 */
                 padding: 15px;
+            }
+
+            /* 更小螢幕下，認證卡片位置微調：更靠近頂部，維持上方滑入 */
+            .cert-info-card {
+                top: 70px;
+                bottom: auto;
+                transform: translateY(-100px);
             }
 
             .led-info-card h3, .cert-info-card h3 {
